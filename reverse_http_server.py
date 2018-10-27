@@ -100,13 +100,11 @@ def run_server(host, port):
 
 
 # Check that the host and port arguments were given
-# if len(argv) < 3 or len(argv) > 3:
-#    print("Usage: %s [host] [port]" % argv[0])
-#    exit(1)
+if len(argv) < 3 or len(argv) > 3:
+    print("Usage: %s [host] [port]" % argv[0])
+    exit(1)
 
 # Start up the listening server
-# host_arg = str(argv[1])
-# port_arg = int(argv[2])
-# run_server(host_arg, port_arg)
-
-run_server("localhost", 8080)
+host_arg = str(argv[1])
+port_arg = int(argv[2])
+run_server(host_arg, port_arg)
